@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:web_socket_channel/html.dart'; // Per Flutter Web
@@ -8,11 +10,10 @@ void main() {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'WebSocket PoE ES',
+      title: 'PoE ES',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -23,7 +24,6 @@ class MyApp extends StatelessWidget {
 
 class WebSocketPage extends StatefulWidget {
   const WebSocketPage({super.key});
-
   @override
   State<WebSocketPage> createState() => _WebSocketPageState();
 }
@@ -33,52 +33,114 @@ class _WebSocketPageState extends State<WebSocketPage> {
   final TextEditingController _messageController = TextEditingController();
   final TextEditingController _peerController = TextEditingController();
   final List<String> _messages = [];
-  final String _peerId = "poe_es"; // Cambiare questo ID per ogni peer
+  final String _peerId = "poe_es"; // ID del peer
+  final String _targetPeer = "poe_client"; // Peer destinatario fisso
 
   @override
   void initState() {
     super.initState();
     // Connetti al server WebSocket
     _channel = HtmlWebSocketChannel.connect('ws://localhost:8080');
-
     // Invia il proprio ID al server
     _channel.sink.add(_peerId);
-
-    // Ascolta i messaggi dal server WebSocket
+    // Ascolta i messaggi dal server
     _channel.stream.listen((message) {
-      setState(() {
-        // Salva i messaggi ricevuti e visualizzali nell'interfaccia
-        _messages.add(message);
-      });
+      _handleMessage(message);
     });
   }
 
-  void _sendMessage() {
-    if (_messageController.text.isNotEmpty && _peerController.text.isNotEmpty) {
-      // Invia il messaggio al peer specificato
-      final targetPeer = _peerController.text;
-      final message = '$_peerId->$targetPeer:${_messageController.text}';
-      _channel.sink.add(message);
+  // Invia un messaggio dato il json
+  void _sendMessage(Map<String, dynamic> message) {
+    _channel.sink.add(jsonEncode(message));
+  }
 
+  /// Invia un messaggio di 'hello' per capire se e' connesso agli altri peers
+  // per creare il json di un messaggio hello
+  Map<String, dynamic> _buildHelloMessage(
+      String targetPeer, String messageKeyString) {
+    if (messageKeyString != "hello" && messageKeyString != "responseHello") {
+      return {
+        "sourcePeer": _peerId,
+        "targetPeer": targetPeer,
+        "payload": base64Encode(utf8.encode(jsonEncode({
+          "error": "Errore: Il formato del messaggio di 'hello' e' sbagliato."
+        }))),
+      };
+    } else {
+      return {
+        "sourcePeer": _peerId,
+        "targetPeer": targetPeer,
+        "payload": base64Encode(
+            utf8.encode(jsonEncode({messageKeyString: "Ciao da $_peerId."}))),
+      };
+    }
+  }
+
+  // Funzione per inviare un messaggio hello al peer target
+  void _sendHello(String targetPeer) {
+    _sendMessage(_buildHelloMessage(targetPeer, 'hello'));
+  }
+
+  /// Controlla se una stringa è un JSON valido
+  bool _isJson(String str) {
+    try {
+      jsonDecode(str);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Gestisce i messaggi ricevuti dal WebSocket
+  void _handleMessage(String message) {
+    try {
+      // Controlla se il messaggio è un JSON valido
+      if (!_isJson(message)) {
+        setState(() {
+          _messages.add("Errore: $message non è in formato JSON.");
+        });
+        return;
+      }
+
+      final data = jsonDecode(message);
+
+      if (data['payload'] != null) {
+        final decodedPayload =
+            jsonDecode(utf8.decode(base64Decode(data['payload'])));
+
+        if (decodedPayload['hello'] != null) {
+          // scrivi il saluto in chat
+          setState(() {
+            _messages.add(decodedPayload['hello']);
+          });
+          // rispondo al saluto
+          _sendMessage(_buildHelloMessage(_targetPeer, 'responseHello'));
+        } else if (decodedPayload['responseHello'] != null) {
+          // scrivi il saluto in chat
+          setState(() {
+            _messages.add(decodedPayload['responseHello']);
+          });
+        }
+      }
+    } catch (e) {
       setState(() {
-        _messages.add('Me to $targetPeer: ${_messageController.text}');
-        _messageController.clear();
-        _peerController.clear();
+        _messages.add("Errore nel parsing del messaggio: $e");
       });
     }
   }
 
   @override
   void dispose() {
-    _channel.sink
-        .close(); // Chiudi la connessione WebSocket quando il widget è distrutto
+    _channel.sink.close();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('WebSocket PoE ES')),
+      appBar: AppBar(
+          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+          title: const Text('PoE ES')),
       body: Column(
         children: [
           Expanded(
@@ -89,29 +151,12 @@ class _WebSocketPageState extends State<WebSocketPage> {
               },
             ),
           ),
+          // Nuovo bottone per testare la connessione con poe_client
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Column(
-              children: [
-                TextField(
-                  controller: _peerController,
-                  decoration: const InputDecoration(
-                    labelText: 'Peer ID to Send Message',
-                  ),
-                ),
-                const SizedBox(height: 8.0),
-                TextField(
-                  controller: _messageController,
-                  decoration: const InputDecoration(
-                    labelText: 'Message',
-                  ),
-                ),
-                const SizedBox(height: 8.0),
-                ElevatedButton(
-                  onPressed: _sendMessage,
-                  child: const Text('Send Message'),
-                ),
-              ],
+            child: ElevatedButton(
+              onPressed: () => _sendHello("poe_client"),
+              child: const Text('Testa connessione con poe_client'),
             ),
           ),
         ],
