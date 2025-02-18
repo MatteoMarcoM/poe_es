@@ -3,6 +3,7 @@ import '../utility/poa_parser.dart';
 import 'package:flutter/material.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:web_socket_channel/html.dart'; // Per Flutter Web
+import '../pages/poa_details_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -133,8 +134,9 @@ class _WebSocketPageState extends State<WebSocketPage> {
             },
             "gps": decodedPayload["gps"],
             "engagement_data": {
-              "encoding": "plain",
-              "data": decodedPayload["engagement_data"]
+              "encoding": "base64",
+              "data":
+                  base64Encode(utf8.encode(decodedPayload["engagement_data"]))
             },
             "sensitive_data": {
               "matricola": decodedPayload["matricola"],
@@ -142,7 +144,7 @@ class _WebSocketPageState extends State<WebSocketPage> {
               "cognome": decodedPayload["cognome"],
               "email": decodedPayload["email"]
             },
-            "other_data": {"data": ""}
+            "other_data": {"": ""}
           };
           // Crea un oggetto PoAParser e verifica se è valido
           PoAParser parser = PoAParser(jsonEncode(targetJson));
@@ -196,13 +198,38 @@ class _WebSocketPageState extends State<WebSocketPage> {
         children: [
           Expanded(
             child: ListView.builder(
-              itemCount: _messages.length,
-              itemBuilder: (context, index) {
-                return ListTile(
-                    title:
-                        Text(_poeList[index].publicKeyVerification.toString()));
-              },
-            ),
+                itemCount: _poeList.length,
+                itemBuilder: (context, index) {
+                  final poe = _poeList[index];
+                  return ListTile(
+                      title: Text(
+                          'PoE #${index + 1}, Proof Type: ${poe.proofType}'),
+                      subtitle:
+                          Text('Public Key: ${poe.publicKeyVerification}'),
+                      trailing: const Icon(Icons.arrow_forward),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => PoADetailsPage(
+                              proofType: poe.proofType,
+                              publicKeyAlgorithm: poe.publicKeyAlgorithm,
+                              publicKeyVerification: poe.publicKeyVerification,
+                              transferable: poe.transferable,
+                              timestampFormat: poe.timestampFormat,
+                              timestampTime: poe.timestampTime,
+                              gpsLat: poe.gpsLat,
+                              gpsLng: poe.gpsLng,
+                              gpsAlt: poe.gpsAlt,
+                              engagementEncoding: poe.engagementEncoding,
+                              engagementData: poe.engagementData,
+                              sensitiveDataHashMap: poe.sensitiveDataHashMap,
+                              otherDataHashMap: poe.otherDataHashMap,
+                            ),
+                          ),
+                        );
+                      });
+                }),
           ),
           // Nuovo bottone per testare la connessione con poe_client
           Padding(

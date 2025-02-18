@@ -55,9 +55,7 @@ class PoAParser {
       // Parsing dei dati sensibili
       final sensitiveData = parsedJson['sensitive_data'];
       sensitiveData.forEach((key, value) {
-        if (key.startsWith('data_')) {
-          sensitiveDataHashMap[key] = value;
-        }
+        sensitiveDataHashMap[key] = value;
       });
 
       // Parsing di other_data
