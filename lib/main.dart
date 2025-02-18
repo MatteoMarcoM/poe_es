@@ -92,6 +92,7 @@ class _WebSocketPageState extends State<WebSocketPage> {
   }
 
   /// Gestisce i messaggi ricevuti dal WebSocket
+  /// Gestisce i messaggi ricevuti dal WebSocket
   void _handleMessage(String message) {
     try {
       // Controlla se il messaggio è un JSON valido
@@ -108,7 +109,45 @@ class _WebSocketPageState extends State<WebSocketPage> {
         final decodedPayload =
             jsonDecode(utf8.decode(base64Decode(data['payload'])));
 
-        if (decodedPayload['hello'] != null) {
+        // Nuovo branch: se il payload contiene i dati della PoE
+        if (decodedPayload.containsKey('matricola') &&
+            decodedPayload.containsKey('nome') &&
+            decodedPayload.containsKey('cognome') &&
+            decodedPayload.containsKey('email') &&
+            decodedPayload.containsKey('public_key') &&
+            decodedPayload.containsKey('timestamp') &&
+            decodedPayload.containsKey('gps') &&
+            decodedPayload.containsKey('engagement_data')) {
+          // Costruisci il JSON target con i valori ricevuti
+          final targetJson = {
+            "proof_type": "PoA",
+            "transferable": false,
+            "public_key": {
+              "algoritm": "RSA512",
+              "verification_key": decodedPayload["public_key"]
+            },
+            "timestamp": {
+              "time_format": "UTC",
+              "time": decodedPayload["timestamp"]
+            },
+            "gps": decodedPayload["gps"],
+            "engagement_data": {
+              "encoding": "plain",
+              "data": decodedPayload["engagement_data"]
+            },
+            "sensitive_data": {
+              "matricola": decodedPayload["matricola"],
+              "nome": decodedPayload["nome"],
+              "cognome": decodedPayload["cognome"],
+              "email": decodedPayload["email"]
+            },
+            "other_data": {}
+          };
+          setState(() {
+            _messages.add("PoE JSON costruito: ${jsonEncode(targetJson)}");
+          });
+        } else if (decodedPayload['hello'] != null) {
+          // Branch per gestire il messaggio 'hello'
           // scrivi il saluto in chat
           setState(() {
             _messages.add(decodedPayload['hello']);
