@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import '../utility/poa_parser.dart';
 import 'package:flutter/material.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:web_socket_channel/html.dart'; // Per Flutter Web
@@ -35,6 +35,7 @@ class _WebSocketPageState extends State<WebSocketPage> {
   final List<String> _messages = [];
   final String _peerId = "poe_es"; // ID del peer
   final String _targetPeer = "poe_client"; // Peer destinatario fisso
+  final List<PoAParser> _poeList = []; // Lista di oggetti PoAParser
 
   @override
   void initState() {
@@ -123,7 +124,7 @@ class _WebSocketPageState extends State<WebSocketPage> {
             "proof_type": "PoA",
             "transferable": false,
             "public_key": {
-              "algoritm": "RSA512",
+              "algorithm": "RSA512",
               "verification_key": decodedPayload["public_key"]
             },
             "timestamp": {
@@ -141,11 +142,22 @@ class _WebSocketPageState extends State<WebSocketPage> {
               "cognome": decodedPayload["cognome"],
               "email": decodedPayload["email"]
             },
-            "other_data": {}
+            "other_data": {"data": ""}
           };
-          setState(() {
-            _messages.add("PoE JSON costruito: ${jsonEncode(targetJson)}");
-          });
+          // Crea un oggetto PoAParser e verifica se è valido
+          PoAParser parser = PoAParser(jsonEncode(targetJson));
+          if (parser.validateAndParse()) {
+            setState(() {
+              _messages.add('PoE valida e ricevuta correttamente!');
+              _poeList.add(parser); // Aggiunge il nuovo PoAParser alla lista
+            });
+          } else {
+            final errorMessage = parser.validate();
+            setState(() {
+              _messages.add(
+                  'Errore nella validazione del JSON ricevuto: $errorMessage');
+            });
+          }
         } else if (decodedPayload['hello'] != null) {
           // Branch per gestire il messaggio 'hello'
           // scrivi il saluto in chat
@@ -186,7 +198,9 @@ class _WebSocketPageState extends State<WebSocketPage> {
             child: ListView.builder(
               itemCount: _messages.length,
               itemBuilder: (context, index) {
-                return ListTile(title: Text(_messages[index]));
+                return ListTile(
+                    title:
+                        Text(_poeList[index].publicKeyVerification.toString()));
               },
             ),
           ),
