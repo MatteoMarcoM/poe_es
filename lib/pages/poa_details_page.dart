@@ -1,6 +1,9 @@
 import 'dart:convert';
-
+import 'dart:typed_data';
+import '../utility/crypto_helper.dart';
 import 'package:flutter/material.dart';
+import 'package:pointycastle/export.dart' as pc;
+import 'package:web_socket_channel/web_socket_channel.dart';
 
 class PoADetailsPage extends StatelessWidget {
   final String proofType;
@@ -16,23 +19,83 @@ class PoADetailsPage extends StatelessWidget {
   final String engagementData;
   final Map<String, String> sensitiveDataHashMap;
   final Map<String, dynamic> otherDataHashMap;
+  // NEW
+  final String rawPoeJson;
+  final int index;
+  final WebSocketChannel channel;
+  final Function(int) onPoERemove;
+  final pc.RSAPrivateKey privateKey;
 
-  const PoADetailsPage({
-    super.key,
-    required this.proofType,
-    required this.publicKeyAlgorithm,
-    required this.publicKeyVerification,
-    required this.transferable,
-    required this.timestampFormat,
-    required this.timestampTime,
-    required this.gpsLat,
-    required this.gpsLng,
-    required this.gpsAlt,
-    required this.engagementEncoding,
-    required this.engagementData,
-    required this.sensitiveDataHashMap,
-    required this.otherDataHashMap,
-  });
+  const PoADetailsPage(
+      {super.key,
+      required this.proofType,
+      required this.publicKeyAlgorithm,
+      required this.publicKeyVerification,
+      required this.transferable,
+      required this.timestampFormat,
+      required this.timestampTime,
+      required this.gpsLat,
+      required this.gpsLng,
+      required this.gpsAlt,
+      required this.engagementEncoding,
+      required this.engagementData,
+      required this.sensitiveDataHashMap,
+      required this.otherDataHashMap,
+      // NEW
+      required this.rawPoeJson,
+      required this.index,
+      required this.channel,
+      required this.onPoERemove,
+      required this.privateKey});
+
+  /// Firma la PoE con la chiave privata e invia al `poe_client`
+  void _approvePoE(BuildContext context) {
+    // Serializza la PoE e codificala in base64
+    String poeBase64 = base64Encode(utf8.encode(rawPoeJson));
+
+    // Firma la PoE
+    Uint8List signatureBytes = CryptoHelper.signJson(rawPoeJson, privateKey);
+    String signatureBase64 = base64Encode(signatureBytes);
+
+    // Costruisci il messaggio
+    final message = {
+      "sourcePeer": "poe_es",
+      "targetPeer": "poe_client",
+      "payload": base64Encode(utf8.encode(jsonEncode({
+        "poe": poeBase64,
+        "signature": signatureBase64,
+      })))
+    };
+
+    // Invia il messaggio al `poe_client`
+    channel.sink.add(jsonEncode(message));
+
+    // Rimuove la PoE dalla lista
+    onPoERemove(index);
+
+    // Torna alla pagina precedente
+    Navigator.pop(context);
+  }
+
+  /// Rifiuta la PoE e invia un messaggio al `poe_client`
+  void _rejectPoE(BuildContext context) {
+    // Costruisci il messaggio di rifiuto
+    final message = {
+      "sourcePeer": "poe_es",
+      "targetPeer": "poe_client",
+      "payload": base64Encode(utf8.encode(jsonEncode(
+          {"rejection": "PoE rifiutata", "public_key": publicKeyVerification})))
+    };
+
+    // Invia il messaggio al `poe_client`
+    channel.sink.add(jsonEncode(message));
+
+    // Rimuove la PoE dalla lista
+    onPoERemove(index);
+
+    // Torna alla pagina precedente
+    Navigator.pop(context);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -111,6 +174,26 @@ class PoADetailsPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 10),
                   _buildOtherDataTable(),
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      ElevatedButton(
+                        onPressed: () => _approvePoE(context),
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green,
+                            textStyle: const TextStyle(color: Colors.black87)),
+                        child: const Text("Approva PoE"),
+                      ),
+                      ElevatedButton(
+                        onPressed: () => _rejectPoE(context),
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red,
+                            textStyle: const TextStyle(color: Colors.black87)),
+                        child: const Text("Rifiuta PoE"),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),

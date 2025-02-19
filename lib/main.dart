@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:web_socket_channel/html.dart'; // Per Flutter Web
 import '../pages/poa_details_page.dart';
+import 'package:pointycastle/export.dart' as pc;
+import '../utility/crypto_helper.dart';
 
 void main() {
   runApp(const MyApp());
@@ -37,10 +39,12 @@ class _WebSocketPageState extends State<WebSocketPage> {
   final String _peerId = "poe_es"; // ID del peer
   final String _targetPeer = "poe_client"; // Peer destinatario fisso
   final List<PoAParser> _poeList = []; // Lista di oggetti PoAParser
+  late pc.AsymmetricKeyPair<pc.PublicKey, pc.PrivateKey> keyPairES;
 
   @override
   void initState() {
     super.initState();
+    keyPairES = CryptoHelper.generateRSAKeyPair();
     // Connetti al server WebSocket
     _channel = HtmlWebSocketChannel.connect('ws://localhost:8080');
     // Invia il proprio ID al server
@@ -188,6 +192,13 @@ class _WebSocketPageState extends State<WebSocketPage> {
     super.dispose();
   }
 
+  // Funzione per rimuovere la PoE dalla lista
+  void _removePoE(int index) {
+    setState(() {
+      _poeList.removeAt(index);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -225,6 +236,13 @@ class _WebSocketPageState extends State<WebSocketPage> {
                               engagementData: poe.engagementData,
                               sensitiveDataHashMap: poe.sensitiveDataHashMap,
                               otherDataHashMap: poe.otherDataHashMap,
+                              // NEW
+                              rawPoeJson: poe.rawJson,
+                              index: index,
+                              channel: _channel,
+                              onPoERemove: _removePoE,
+                              privateKey:
+                                  keyPairES.privateKey as pc.RSAPrivateKey,
                             ),
                           ),
                         );
