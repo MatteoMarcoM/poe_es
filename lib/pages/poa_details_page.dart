@@ -51,7 +51,7 @@ class PoADetailsPage extends StatelessWidget {
   /// Firma la PoE con la chiave privata e invia al `poe_client`
   void _approvePoE(BuildContext context) {
     // Serializza la PoE e codificala in base64
-    String poeBase64 = base64Encode(utf8.encode(rawPoeJson));
+    //String poeBase64 = base64Encode(utf8.encode(rawPoeJson));
 
     // Firma la PoE
     Uint8List signatureBytes = CryptoHelper.signJson(rawPoeJson, privateKey);
@@ -62,7 +62,7 @@ class PoADetailsPage extends StatelessWidget {
       "sourcePeer": "poe_es",
       "targetPeer": "poe_client",
       "payload": base64Encode(utf8.encode(jsonEncode({
-        "poe": poeBase64,
+        "poe": rawPoeJson,
         "signature": signatureBase64,
       })))
     };

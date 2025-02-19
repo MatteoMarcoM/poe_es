@@ -209,6 +209,14 @@ class _WebSocketPageState extends State<WebSocketPage> {
         children: [
           Expanded(
             child: ListView.builder(
+              itemCount: _messages.length,
+              itemBuilder: (context, index) => ListTile(
+                title: Text(_messages[index]),
+              ),
+            ),
+          ),
+          Expanded(
+            child: ListView.builder(
                 itemCount: _poeList.length,
                 itemBuilder: (context, index) {
                   final poe = _poeList[index];
