@@ -25,6 +25,7 @@ class PoADetailsPage extends StatelessWidget {
   final WebSocketChannel channel;
   final Function(int) onPoERemove;
   final pc.RSAPrivateKey privateKey;
+  final String requestId;
 
   const PoADetailsPage(
       {super.key,
@@ -46,7 +47,8 @@ class PoADetailsPage extends StatelessWidget {
       required this.index,
       required this.channel,
       required this.onPoERemove,
-      required this.privateKey});
+      required this.privateKey,
+      required this.requestId});
 
   /// Firma la PoE con la chiave privata e invia al `poe_client`
   void _approvePoE(BuildContext context) {
@@ -64,6 +66,7 @@ class PoADetailsPage extends StatelessWidget {
       "payload": base64Encode(utf8.encode(jsonEncode({
         "poe": rawPoeJson,
         "signature": signatureBase64,
+        "request_id": requestId
       })))
     };
 

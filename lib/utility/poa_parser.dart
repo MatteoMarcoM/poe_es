@@ -24,6 +24,9 @@ class PoAParser {
   Map<String, String> sensitiveDataHashMap = {'': ''};
   Map<String, dynamic> otherDataHashMap = {'': ''};
 
+  // NEW
+  String? requestId;
+
   bool validateAndParse() {
     String validationMessage = validate();
     if (validationMessage == successMessage) {

@@ -54,4 +54,25 @@ class CryptoHelper {
         BigInt.parse(String.fromCharCodes(keyBytes.sublist(256)), radix: 16);
     return RSAPublicKey(modulus, exponent);
   }
+
+  /// Converte una chiave pubblica RSA in una stringa codificata in Base64
+  static String encodeRSAPublicKeyToBase64(RSAPublicKey publicKey) {
+    final modulus = publicKey.modulus;
+    final exponent = publicKey.exponent;
+
+    if (modulus == null || exponent == null) {
+      throw ArgumentError("La chiave pubblica RSA non è valida.");
+    }
+
+    // Serializza la chiave pubblica (modulus + exponent) come Uint8List
+    final modulusBytes = modulus.toRadixString(16).padLeft(256, '0');
+    final exponentBytes = exponent.toRadixString(16);
+
+    final combinedBytes = Uint8List.fromList(
+      [...modulusBytes.codeUnits, ...exponentBytes.codeUnits],
+    );
+
+    // Codifica in Base64
+    return base64Encode(combinedBytes);
+  }
 }

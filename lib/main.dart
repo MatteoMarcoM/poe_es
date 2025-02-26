@@ -123,7 +123,8 @@ class _WebSocketPageState extends State<WebSocketPage> {
             decodedPayload.containsKey('public_key') &&
             decodedPayload.containsKey('timestamp') &&
             decodedPayload.containsKey('gps') &&
-            decodedPayload.containsKey('engagement_data')) {
+            decodedPayload.containsKey('engagement_data') &&
+            decodedPayload.containsKey('request_id')) {
           // Costruisci il JSON target con i valori ricevuti
           final targetJson = {
             "proof_type": "PoA",
@@ -152,6 +153,8 @@ class _WebSocketPageState extends State<WebSocketPage> {
           };
           // Crea un oggetto PoAParser e verifica se è valido
           PoAParser parser = PoAParser(jsonEncode(targetJson));
+          // aggiungi il request id
+          parser.requestId = decodedPayload['request_id'];
           if (parser.validateAndParse()) {
             setState(() {
               _messages.add('PoE valida e ricevuta correttamente!');
@@ -164,6 +167,24 @@ class _WebSocketPageState extends State<WebSocketPage> {
                   'Errore nella validazione del JSON ricevuto: $errorMessage');
             });
           }
+        } else if (decodedPayload["request"] == "verification_key") {
+          final verificationKey = CryptoHelper.encodeRSAPublicKeyToBase64(
+              keyPairES.publicKey as pc.RSAPublicKey);
+          final responseJson = jsonEncode({
+            "verification_key": verificationKey,
+          });
+
+          final responseMessage = {
+            "sourcePeer": "poe_es",
+            "targetPeer": "poe_tp",
+            "payload": base64Encode(utf8.encode(responseJson))
+          };
+
+          _sendMessage(responseMessage);
+          setState(() {
+            _messages
+                .add("Chiave di verifica inviata al poe_tp: $verificationKey");
+          });
         } else if (decodedPayload['hello'] != null) {
           // Branch per gestire il messaggio 'hello'
           // scrivi il saluto in chat
@@ -251,6 +272,7 @@ class _WebSocketPageState extends State<WebSocketPage> {
                               onPoERemove: _removePoE,
                               privateKey:
                                   keyPairES.privateKey as pc.RSAPrivateKey,
+                              requestId: poe.requestId!,
                             ),
                           ),
                         );
@@ -265,6 +287,13 @@ class _WebSocketPageState extends State<WebSocketPage> {
               child: const Text('Testa connessione con poe_client'),
             ),
           ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ElevatedButton(
+              onPressed: () => _sendHello("poe_tp"),
+              child: const Text('Testa connessione con poe_tp'),
+            ),
+          )
         ],
       ),
     );
