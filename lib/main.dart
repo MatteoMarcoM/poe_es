@@ -167,11 +167,11 @@ class _WebSocketPageState extends State<WebSocketPage> {
                   'Errore nella validazione del JSON ricevuto: $errorMessage');
             });
           }
-        } else if (decodedPayload["request"] == "verification_key") {
+        } else if (decodedPayload["request"] == "es_verification_key") {
           final verificationKey = CryptoHelper.encodeRSAPublicKeyToBase64(
               keyPairES.publicKey as pc.RSAPublicKey);
           final responseJson = jsonEncode({
-            "verification_key": verificationKey,
+            "es_verification_key": verificationKey,
           });
 
           final responseMessage = {
