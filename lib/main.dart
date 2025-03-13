@@ -55,7 +55,7 @@ class _WebSocketPageState extends State<WebSocketPage> {
     });
   }
 
-  // Invia un messaggio dato il json
+  // per inviare un messaggio dato il json
   void _sendMessage(Map<String, dynamic> message) {
     _channel.sink.add(jsonEncode(message));
   }
@@ -186,13 +186,13 @@ class _WebSocketPageState extends State<WebSocketPage> {
                 .add("Chiave di verifica inviata al poe_tp: $verificationKey");
           });
         } else if (decodedPayload['hello'] != null) {
-          // Branch per gestire il messaggio 'hello'
           // scrivi il saluto in chat
           setState(() {
             _messages.add(decodedPayload['hello']);
           });
           // rispondo al saluto
-          _sendMessage(_buildHelloMessage(_targetPeer, 'responseHello'));
+          final targetPeerName = data['sourcePeer'];
+          _sendMessage(_buildHelloMessage(targetPeerName, 'responseHello'));
         } else if (decodedPayload['responseHello'] != null) {
           // scrivi il saluto in chat
           setState(() {
