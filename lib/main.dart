@@ -224,77 +224,159 @@ class _WebSocketPageState extends State<WebSocketPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-          title: const Text('PoE ES')),
-      body: Column(
-        children: [
-          Expanded(
-            child: ListView.builder(
-              itemCount: _messages.length,
-              itemBuilder: (context, index) => ListTile(
-                title: Text(_messages[index]),
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        title: const Text('PoE ES'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Titolo sopra la lista delle PoE da approvare
+            const Text(
+              "PoE da approvare",
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.deepPurple,
               ),
             ),
-          ),
-          Expanded(
-            child: ListView.builder(
-                itemCount: _poeList.length,
-                itemBuilder: (context, index) {
-                  final poe = _poeList[index];
-                  return ListTile(
-                      title: Text(
-                          'PoE #${index + 1}, Proof Type: ${poe.proofType}'),
-                      subtitle:
-                          Text('Public Key: ${poe.publicKeyVerification}'),
-                      trailing: const Icon(Icons.arrow_forward),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => PoADetailsPage(
-                              proofType: poe.proofType,
-                              publicKeyAlgorithm: poe.publicKeyAlgorithm,
-                              publicKeyVerification: poe.publicKeyVerification,
-                              transferable: poe.transferable,
-                              timestampFormat: poe.timestampFormat,
-                              timestampTime: poe.timestampTime,
-                              gpsLat: poe.gpsLat,
-                              gpsLng: poe.gpsLng,
-                              gpsAlt: poe.gpsAlt,
-                              engagementEncoding: poe.engagementEncoding,
-                              engagementData: poe.engagementData,
-                              sensitiveDataHashMap: poe.sensitiveDataHashMap,
-                              otherDataHashMap: poe.otherDataHashMap,
-                              // NEW
-                              rawPoeJson: poe.rawJson,
-                              index: index,
-                              channel: _channel,
-                              onPoERemove: _removePoE,
-                              privateKey:
-                                  keyPairES.privateKey as pc.RSAPrivateKey,
-                              requestId: poe.requestId!,
+            const SizedBox(height: 8),
+
+            // Box con la ListView delle PoE da approvare
+            Expanded(
+              child: Card(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                elevation: 4,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ListView.builder(
+                    itemCount: _poeList.length,
+                    itemBuilder: (context, index) {
+                      final poe = _poeList[index];
+                      return ListTile(
+                        leading: Icon(Icons.assignment, color: Colors.orange),
+                        title: Text(
+                          'PoE #${index + 1} - ${poe.proofType}',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        subtitle: Text(
+                          'Public Key: ${poe.publicKeyVerification}',
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        tileColor: Colors.grey[200],
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        trailing: Icon(Icons.arrow_forward, color: Colors.blue),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => PoADetailsPage(
+                                proofType: poe.proofType,
+                                publicKeyAlgorithm: poe.publicKeyAlgorithm,
+                                publicKeyVerification:
+                                    poe.publicKeyVerification,
+                                transferable: poe.transferable,
+                                timestampFormat: poe.timestampFormat,
+                                timestampTime: poe.timestampTime,
+                                gpsLat: poe.gpsLat,
+                                gpsLng: poe.gpsLng,
+                                gpsAlt: poe.gpsAlt,
+                                engagementEncoding: poe.engagementEncoding,
+                                engagementData: poe.engagementData,
+                                sensitiveDataHashMap: poe.sensitiveDataHashMap,
+                                otherDataHashMap: poe.otherDataHashMap,
+                                rawPoeJson: poe.rawJson,
+                                index: index,
+                                channel: _channel,
+                                onPoERemove: _removePoE,
+                                privateKey:
+                                    keyPairES.privateKey as pc.RSAPrivateKey,
+                                requestId: poe.requestId!,
+                              ),
                             ),
-                          ),
-                        );
-                      });
-                }),
-          ),
-          // Nuovo bottone per testare la connessione con poe_client
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ElevatedButton(
-              onPressed: () => _sendHello("poe_client"),
-              child: const Text('Testa connessione con poe_client'),
+                          );
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ElevatedButton(
-              onPressed: () => _sendHello("poe_tp"),
-              child: const Text('Testa connessione con poe_tp'),
+
+            const SizedBox(height: 16),
+
+            // Titolo sopra la lista dei messaggi ricevuti
+            const Text(
+              "Messaggi Ricevuti",
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.deepPurple,
+              ),
             ),
-          )
-        ],
+            const SizedBox(height: 8),
+
+            // Box con la ListView dei messaggi ricevuti
+            Expanded(
+              child: Card(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                elevation: 4,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ListView.builder(
+                    itemCount: _messages.length,
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        leading: Icon(Icons.message, color: Colors.deepPurple),
+                        title: Text(_messages[index]),
+                        tileColor: Colors.grey[200],
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            // Bottoni migliorati con icone e colori
+            Wrap(
+              spacing: 8.0,
+              runSpacing: 8.0,
+              alignment: WrapAlignment.center,
+              children: [
+                ElevatedButton.icon(
+                  onPressed: () => _sendHello("poe_client"),
+                  icon: Icon(Icons.network_check),
+                  label: const Text('Testa connessione con poe_client'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
+                  ),
+                ),
+                ElevatedButton.icon(
+                  onPressed: () => _sendHello("poe_tp"),
+                  icon: Icon(Icons.network_check),
+                  label: const Text('Testa connessione con poe_tp'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
