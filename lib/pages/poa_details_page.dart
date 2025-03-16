@@ -86,7 +86,8 @@ class PoADetailsPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: const Text('Dettagli PoE'),
+        title:
+            const Text('Dettagli PoE', style: TextStyle(color: Colors.black)),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
@@ -140,7 +141,7 @@ class PoADetailsPage extends StatelessWidget {
                   _buildSectionTitle("Dati di Engagement"),
                   _buildTable([
                     _buildTableRow('Codifica', engagementEncoding),
-                    _buildTableRow('Dati (Base64)', engagementData),
+                    _buildTableRow('Dati', engagementData),
                     _buildTableRow('Dati Decodificati',
                         utf8.decode(base64Decode(engagementData))),
                   ]),
