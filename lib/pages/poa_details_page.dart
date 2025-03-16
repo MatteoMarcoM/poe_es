@@ -184,38 +184,49 @@ class PoADetailsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildSectionTitle(String title) {
-    return Text(
-      title,
-      style: const TextStyle(
-          fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blueAccent),
-    );
-  }
-
-  Widget _buildTable(List<TableRow> rows) {
-    return Table(
-      columnWidths: const {0: FlexColumnWidth(1), 1: FlexColumnWidth(2)},
-      border: TableBorder.all(color: Colors.grey.shade300),
-      children: rows,
-    );
-  }
-
-  TableRow _buildTableRow(String key, String value) {
-    return TableRow(
+  /// **Titolo della sezione con icona**
+  Widget _buildTitle(String text, IconData icon, Color color) {
+    return Row(
       children: [
-        Container(
-          color: Colors.grey.shade200,
-          padding: const EdgeInsets.all(8.0),
-          child: Text(
-            key,
-            style: const TextStyle(fontWeight: FontWeight.bold),
+        Icon(icon, color: color, size: 28),
+        const SizedBox(width: 8),
+        Text(
+          text,
+          style: const TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: SelectableText(value),
-        ),
       ],
+    );
+  }
+
+  /// **Titolo di una sezione**
+  Widget _buildSectionTitle(String title) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Text(
+        title,
+        style: const TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+          color: Colors.blueAccent,
+        ),
+      ),
+    );
+  }
+
+  /// **Tabella migliorata**
+  Widget _buildTable(List<TableRow> rows) {
+    return Table(
+      columnWidths: const {
+        0: FlexColumnWidth(1),
+        1: FlexColumnWidth(2),
+      },
+      border: TableBorder(
+        horizontalInside: BorderSide(color: Colors.grey.shade300, width: 1),
+      ),
+      children: rows,
     );
   }
 
@@ -226,6 +237,35 @@ class PoADetailsPage extends StatelessWidget {
       children: data.entries.map((entry) {
         return _buildTableRow(entry.key, entry.value.toString());
       }).toList(),
+    );
+  }
+
+  /// **Singola riga della tabella**
+  TableRow _buildTableRow(String key, String value) {
+    return TableRow(
+      decoration: BoxDecoration(
+        color: Colors.grey.shade100,
+        borderRadius: BorderRadius.circular(5),
+      ),
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: Text(
+            key,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: Text(
+            value,
+            style: const TextStyle(fontSize: 16),
+          ),
+        ),
+      ],
     );
   }
 }
