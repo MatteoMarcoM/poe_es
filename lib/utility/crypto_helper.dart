@@ -61,7 +61,7 @@ class CryptoHelper {
     final exponent = publicKey.exponent;
 
     if (modulus == null || exponent == null) {
-      throw ArgumentError("La chiave pubblica RSA non è valida.");
+      throw ArgumentError("RSA public key is invalid.");
     }
 
     // Serializza la chiave pubblica (modulus + exponent) come Uint8List

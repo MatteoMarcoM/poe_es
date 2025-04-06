@@ -65,9 +65,9 @@ class _WebSocketPageState extends State<WebSocketPage> {
         "data": base64Encode(utf8.encode(decodedPayload["engagement_data"]))
       },
       "sensitive_data": {
-        "matricola": decodedPayload["matricola"],
-        "nome": decodedPayload["nome"],
-        "cognome": decodedPayload["cognome"],
+        "registration_number": decodedPayload["registration_number"],
+        "name": decodedPayload["name"],
+        "surname": decodedPayload["surname"],
         "email": decodedPayload["email"]
       },
       "other_data": {"": ""}
@@ -76,14 +76,13 @@ class _WebSocketPageState extends State<WebSocketPage> {
     parser.requestId = decodedPayload['request_id'];
     if (parser.validateAndParse()) {
       setState(() {
-        _messages.add('PoE valida e ricevuta correttamente!');
+        _messages.add('PoE valid and received correctly!');
         _poeList.add(parser);
       });
     } else {
       final errorMessage = parser.validate();
       setState(() {
-        _messages
-            .add('Errore nella validazione del JSON ricevuto: $errorMessage');
+        _messages.add('Error validating received JSON: $errorMessage');
       });
     }
   }
@@ -102,7 +101,7 @@ class _WebSocketPageState extends State<WebSocketPage> {
     };
     _sendMessage(responseMessage);
     setState(() {
-      _messages.add("Chiave di verifica inviata al poe_tp: $verificationKey");
+      _messages.add("Verification key sent to poe_tp: $verificationKey");
     });
   }
 
@@ -128,7 +127,7 @@ class _WebSocketPageState extends State<WebSocketPage> {
     try {
       if (!_isJson(message)) {
         setState(() {
-          _messages.add("Errore: $message non è in formato JSON.");
+          _messages.add("Error: $message is not in JSON format.");
         });
         return;
       }
@@ -136,9 +135,9 @@ class _WebSocketPageState extends State<WebSocketPage> {
       if (data['payload'] != null) {
         final decodedPayload =
             jsonDecode(utf8.decode(base64Decode(data['payload'])));
-        if (decodedPayload.containsKey('matricola') &&
-            decodedPayload.containsKey('nome') &&
-            decodedPayload.containsKey('cognome') &&
+        if (decodedPayload.containsKey('registration_number') &&
+            decodedPayload.containsKey('name') &&
+            decodedPayload.containsKey('surname') &&
             decodedPayload.containsKey('email') &&
             decodedPayload.containsKey('public_key') &&
             decodedPayload.containsKey('timestamp') &&
@@ -156,7 +155,7 @@ class _WebSocketPageState extends State<WebSocketPage> {
       }
     } catch (e) {
       setState(() {
-        _messages.add("Errore nel parsing del messaggio: $e");
+        _messages.add("Error parsing message: $e");
       });
     }
   }
@@ -201,9 +200,9 @@ class _WebSocketPageState extends State<WebSocketPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Titolo sopra la lista delle PoE da approvare
+            // Title above the list of PoEs to approve
             const Text(
-              "PoE da approvare",
+              "PoE to Approve",
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -246,9 +245,9 @@ class _WebSocketPageState extends State<WebSocketPage> {
             ),
             const SizedBox(height: 16),
 
-            // Titolo sopra la lista dei messaggi ricevuti
+            // Title above the list of received messages
             const Text(
-              "Messaggi Ricevuti",
+              "Received Messages",
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -268,7 +267,7 @@ class _WebSocketPageState extends State<WebSocketPage> {
                 ElevatedButton.icon(
                   onPressed: () => _sendHello("poe_client"),
                   icon: const Icon(Icons.network_check),
-                  label: const Text('Testa connessione con poe_client'),
+                  label: const Text('Test connection with poe_client'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue,
                     foregroundColor: Colors.white,
@@ -277,7 +276,7 @@ class _WebSocketPageState extends State<WebSocketPage> {
                 ElevatedButton.icon(
                   onPressed: () => _sendHello("poe_tp"),
                   icon: const Icon(Icons.network_check),
-                  label: const Text('Testa connessione con poe_tp'),
+                  label: const Text('Test connection with poe_tp'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue,
                     foregroundColor: Colors.white,

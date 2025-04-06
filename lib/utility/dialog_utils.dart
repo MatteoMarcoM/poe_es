@@ -15,7 +15,7 @@ class DialogUtils {
             children: [
               Icon(Icons.error_outline, color: Colors.red, size: 28),
               SizedBox(width: 10),
-              Text('PoE Rifiutata',
+              Text('PoE Rejected',
                   style: TextStyle(fontWeight: FontWeight.bold)),
             ],
           ),
@@ -24,7 +24,7 @@ class DialogUtils {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
-                  'La PoE è stata rifiutata per la seguente chiave pubblica:',
+                  'The PoE has been rejected for the following public key:',
                   style: TextStyle(fontSize: 16)),
               const SizedBox(height: 10),
               SelectableText(
@@ -70,7 +70,7 @@ class DialogUtils {
                 borderRadius: BorderRadius.circular(12),
               ),
               title: const Text(
-                "Inserisci i dati",
+                "Enter Data",
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               content: SizedBox(
@@ -89,39 +89,39 @@ class DialogUtils {
                           children: [
                             CommonWidgets.buildTextField(
                               controller: matricolaController,
-                              label: "Matricola",
+                              label: "ID Number",
                               icon: Icons.badge,
                               keyboardType: TextInputType.number,
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
-                                  return 'Inserisci la matricola';
+                                  return 'Please enter ID number';
                                 }
                                 if (!RegExp(r'^\d+$').hasMatch(value)) {
-                                  return 'La matricola deve essere un numero';
+                                  return 'ID must be a number';
                                 }
                                 return null;
                               },
                             ),
                             CommonWidgets.buildTextField(
                               controller: nomeController,
-                              label: "Nome",
+                              label: "First Name",
                               icon: Icons.person,
                               keyboardType: TextInputType.text,
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
-                                  return 'Inserisci il nome';
+                                  return 'Please enter first name';
                                 }
                                 return null;
                               },
                             ),
                             CommonWidgets.buildTextField(
                               controller: cognomeController,
-                              label: "Cognome",
+                              label: "Last Name",
                               icon: Icons.person_outline,
                               keyboardType: TextInputType.text,
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
-                                  return 'Inserisci il cognome';
+                                  return 'Please enter last name';
                                 }
                                 return null;
                               },
@@ -133,11 +133,11 @@ class DialogUtils {
                               keyboardType: TextInputType.emailAddress,
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
-                                  return 'Inserisci l\'email';
+                                  return 'Please enter email';
                                 }
                                 if (!RegExp(r'^[^@]+@[^@]+\.[^@]+')
                                     .hasMatch(value)) {
-                                  return 'Inserisci un\'email valida';
+                                  return 'Please enter a valid email';
                                 }
                                 return null;
                               },
@@ -147,7 +147,7 @@ class DialogUtils {
                               child: TextFormField(
                                 controller: engagementDataController,
                                 decoration: const InputDecoration(
-                                  labelText: "Dati di Engagement",
+                                  labelText: "Engagement Data",
                                   icon: Icon(Icons.dataset),
                                   border: OutlineInputBorder(),
                                 ),
@@ -155,7 +155,7 @@ class DialogUtils {
                                 maxLines: 5,
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {
-                                    return 'Inserisci i dati di engagement';
+                                    return 'Please enter engagement data';
                                   }
                                   return null;
                                 },
@@ -171,8 +171,8 @@ class DialogUtils {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  child: const Text("Annulla",
-                      style: TextStyle(color: Colors.red)),
+                  child:
+                      const Text("Cancel", style: TextStyle(color: Colors.red)),
                 ),
                 ElevatedButton.icon(
                   onPressed: () {
@@ -188,7 +188,7 @@ class DialogUtils {
                     }
                   },
                   icon: const Icon(Icons.send),
-                  label: const Text("Invia"),
+                  label: const Text("Submit"),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue,
                     foregroundColor: Colors.white,

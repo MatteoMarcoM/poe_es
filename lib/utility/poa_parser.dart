@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-const String successMessage = 'JSON valido!';
-const String failMessage = 'Errore: JSON non valido!';
+const String successMessage = 'Valid JSON!';
+const String failMessage = 'Error: Invalid JSON!';
 
 class PoAParser {
   final String rawJson;
@@ -79,88 +79,88 @@ class PoAParser {
       // Verifica delle chiavi principali
       if (!parsedJson.containsKey('proof_type') ||
           parsedJson['proof_type'] is! String) {
-        return 'Errore: Il campo "proof_type" è mancante o non è una stringa.';
+        return 'Error: The "proof_type" field is missing or is not a string.';
       }
       if (!parsedJson.containsKey('transferable') ||
           parsedJson['transferable'] is! bool) {
-        return 'Errore: Il campo "transferable" è mancante o non è un booleano.';
+        return 'Error: The "transferable" field is missing or is not a boolean.';
       }
       if (!parsedJson.containsKey('public_key') ||
           parsedJson['public_key'] is! Map) {
-        return 'Errore: Il campo "public_key" è mancante o non è un oggetto.';
+        return 'Error: The "public_key" field is missing or is not an object.';
       }
 
       // Verifica della chiave pubblica
       final publicKey = parsedJson['public_key'];
       if (!publicKey.containsKey('algorithm') ||
           publicKey['algorithm'] is! String) {
-        return 'Errore: Il campo "algorithm" è mancante o non è una stringa.';
+        return 'Error: The "algorithm" field is missing or is not a string.';
       }
       if (!publicKey.containsKey('verification_key') ||
           publicKey['verification_key'] is! String) {
-        return 'Errore: Il campo "verification_key" è mancante o non è una stringa.';
+        return 'Error: The "verification_key" field is missing or is not a string.';
       }
 
       // Verifica del timestamp
       if (!parsedJson.containsKey('timestamp') ||
           parsedJson['timestamp'] is! Map) {
-        return 'Errore: Il campo "timestamp" è mancante o non è un oggetto.';
+        return 'Error: The "timestamp" field is missing or is not an object.';
       }
       final timestamp = parsedJson['timestamp'];
       if (!timestamp.containsKey('time_format') ||
           timestamp['time_format'] is! String) {
-        return 'Errore: Il campo "time_format" è mancante o non è una stringa.';
+        return 'Error: The "time_format" field is missing or is not a string.';
       }
       if (!timestamp.containsKey('time') || timestamp['time'] is! String) {
-        return 'Errore: Il campo "time" è mancante o non è una stringa.';
+        return 'Error: The "time" field is missing or is not a string.';
       }
 
       // Verifica delle coordinate GPS
       if (!parsedJson.containsKey('gps') || parsedJson['gps'] is! Map) {
-        return 'Errore: Il campo "gps" è mancante o non è un oggetto.';
+        return 'Error: The "gps" field is missing or is not an object.';
       }
       final gps = parsedJson['gps'];
       if (!gps.containsKey('lat') || gps['lat'] is! num) {
-        return 'Errore: Il campo "lat" è mancante o non è un numero.';
+        return 'Error: The "lat" field is missing or is not a number.';
       }
       if (!gps.containsKey('lng') || gps['lng'] is! num) {
-        return 'Errore: Il campo "lng" è mancante o non è un numero.';
+        return 'Error: The "lng" field is missing or is not a number.';
       }
       if (!gps.containsKey('alt') || gps['alt'] is! num) {
-        return 'Errore: Il campo "alt" è mancante o non è un numero.';
+        return 'Error: The "alt" field is missing or is not a number.';
       }
 
       // Verifica dei dati di engagement
       if (!parsedJson.containsKey('engagement_data') ||
           parsedJson['engagement_data'] is! Map) {
-        return 'Errore: Il campo "engagement_data" è mancante o non è un oggetto.';
+        return 'Error: The "engagement_data" field is missing or is not an object.';
       }
       final engagementData = parsedJson['engagement_data'];
       if (!engagementData.containsKey('encoding') ||
           engagementData['encoding'] is! String) {
-        return 'Errore: Il campo "encoding" è mancante o non è una stringa.';
+        return 'Error: The "encoding" field is missing or is not a string.';
       }
       if (!engagementData.containsKey('data') ||
           engagementData['data'] is! String) {
-        return 'Errore: Il campo "data" è mancante o non è una stringa.';
+        return 'Error: The "data" field is missing or is not a string.';
       }
 
       // Verifica dei dati sensibili
       if (!parsedJson.containsKey('sensitive_data') ||
           parsedJson['sensitive_data'] is! Map) {
-        return 'Errore: Il campo "sensitive_data" è mancante o non è un oggetto.';
+        return 'Error: The "sensitive_data" field is missing or is not an object.';
       }
       final sensitiveData = parsedJson['sensitive_data'];
       sensitiveData.forEach((key, value) {
         if (key.startsWith('data_') && value is! String) {
-          return 'Errore: Il campo "$key" nei dati sensibili non è una stringa.';
+          return 'Error: The "$key" field in sensitive data is not a string.';
         }
       });
 
       // Verifica di other_data (facoltativa)
       if (parsedJson.containsKey('other_data') &&
           parsedJson['other_data'] is! Map) {
-        return 'Errore: Il campo "other_data" non è un oggetto JSON valido.';
+        return 'Error: The "other_data" field is not a valid JSON object.';
       }
 
       return successMessage;
