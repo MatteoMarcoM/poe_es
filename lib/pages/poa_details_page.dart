@@ -85,7 +85,7 @@ class PoADetailsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: UIComponents.buildAppBar(context, 'Dettagli PoE'),
+      appBar: UIComponents.buildDetailsAppBar(context, 'Dettagli PoE'),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(

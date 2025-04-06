@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
 
 class UIComponents {
-  static AppBar buildAppBar(BuildContext context, String title) {
+  static AppBar buildDefaultAppBar(BuildContext context, String title) {
+    return AppBar(
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        title: Text(title, style: const TextStyle(color: Colors.black)));
+  }
+
+  static AppBar buildDetailsAppBar(BuildContext context, String title) {
     return AppBar(
       backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       title: Text(title, style: const TextStyle(color: Colors.black)),

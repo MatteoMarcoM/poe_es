@@ -195,7 +195,7 @@ class _WebSocketPageState extends State<WebSocketPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: UIComponents.buildAppBar(context, 'PoE ES'),
+      appBar: UIComponents.buildDefaultAppBar(context, 'PoE ES'),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
