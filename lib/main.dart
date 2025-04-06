@@ -49,7 +49,7 @@ class _WebSocketPageState extends State<WebSocketPage> {
     );
   }
 
-  // Nuova funzione per gestire i messaggi contenenti dati PoE
+  // New function to handle messages containing PoE data
   void _handlePoEPayload(Map decodedPayload) {
     final targetJson = {
       "proof_type": "PoA",
@@ -87,7 +87,7 @@ class _WebSocketPageState extends State<WebSocketPage> {
     }
   }
 
-  // Nuova funzione per gestire la richiesta della chiave di verifica
+  // New function to handle the verification key request
   void _handleVerificationKeyPayload(Map decodedPayload) {
     final verificationKey = CryptoHelper.encodeRSAPublicKeyToBase64(
         keyPairES.publicKey as pc.RSAPublicKey);
@@ -105,7 +105,7 @@ class _WebSocketPageState extends State<WebSocketPage> {
     });
   }
 
-  // Nuova funzione per gestire i messaggi 'hello'
+  // New function to handle 'hello' messages
   void _handleHelloPayload(Map decodedPayload, Map data) {
     setState(() {
       _messages.add(decodedPayload['hello']);
@@ -115,14 +115,14 @@ class _WebSocketPageState extends State<WebSocketPage> {
         _webSocketService.buildHelloMessage(targetPeerName, 'responseHello'));
   }
 
-  // Nuova funzione per gestire i messaggi 'responseHello'
+  // New function to handle 'responseHello' messages
   void _handleResponseHelloPayload(Map decodedPayload) {
     setState(() {
       _messages.add(decodedPayload['responseHello']);
     });
   }
 
-  // Funzione refattorizzata per gestire i messaggi WebSocket
+  // Refactored function to handle WebSocket messages
   void _handleMessage(String message) {
     try {
       if (!_isJson(message)) {
@@ -168,7 +168,7 @@ class _WebSocketPageState extends State<WebSocketPage> {
     _sendMessage(_webSocketService.buildHelloMessage(targetPeer, 'hello'));
   }
 
-  /// Controlla se una stringa è un JSON valido
+  /// Check if a string is valid JSON
   bool _isJson(String str) {
     try {
       jsonDecode(str);
@@ -184,7 +184,7 @@ class _WebSocketPageState extends State<WebSocketPage> {
     super.dispose();
   }
 
-  // Funzione per rimuovere la PoE dalla lista
+  // Function to remove the PoE from the list
   void _removePoE(int index) {
     setState(() {
       _poeList.removeAt(index);

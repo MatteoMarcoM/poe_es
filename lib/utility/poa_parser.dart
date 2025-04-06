@@ -9,7 +9,7 @@ class PoAParser {
 
   PoAParser(this.rawJson);
 
-  // Informazioni estratte dal JSON
+  // Extracted information from JSON
   String proofType = '';
   bool transferable = false;
   String publicKeyAlgorithm = '';
@@ -76,7 +76,7 @@ class PoAParser {
     try {
       parsedJson = jsonDecode(rawJson);
 
-      // Verifica delle chiavi principali
+      // Validation of main keys
       if (!parsedJson.containsKey('proof_type') ||
           parsedJson['proof_type'] is! String) {
         return 'Error: The "proof_type" field is missing or is not a string.';
@@ -90,7 +90,7 @@ class PoAParser {
         return 'Error: The "public_key" field is missing or is not an object.';
       }
 
-      // Verifica della chiave pubblica
+      // Public key validation
       final publicKey = parsedJson['public_key'];
       if (!publicKey.containsKey('algorithm') ||
           publicKey['algorithm'] is! String) {
@@ -101,7 +101,7 @@ class PoAParser {
         return 'Error: The "verification_key" field is missing or is not a string.';
       }
 
-      // Verifica del timestamp
+      // Timestamp validation
       if (!parsedJson.containsKey('timestamp') ||
           parsedJson['timestamp'] is! Map) {
         return 'Error: The "timestamp" field is missing or is not an object.';
@@ -115,7 +115,7 @@ class PoAParser {
         return 'Error: The "time" field is missing or is not a string.';
       }
 
-      // Verifica delle coordinate GPS
+      // GPS coordinates validation
       if (!parsedJson.containsKey('gps') || parsedJson['gps'] is! Map) {
         return 'Error: The "gps" field is missing or is not an object.';
       }
@@ -130,7 +130,7 @@ class PoAParser {
         return 'Error: The "alt" field is missing or is not a number.';
       }
 
-      // Verifica dei dati di engagement
+      // Engagement data validation
       if (!parsedJson.containsKey('engagement_data') ||
           parsedJson['engagement_data'] is! Map) {
         return 'Error: The "engagement_data" field is missing or is not an object.';
@@ -145,7 +145,7 @@ class PoAParser {
         return 'Error: The "data" field is missing or is not a string.';
       }
 
-      // Verifica dei dati sensibili
+      // Sensitive data validation
       if (!parsedJson.containsKey('sensitive_data') ||
           parsedJson['sensitive_data'] is! Map) {
         return 'Error: The "sensitive_data" field is missing or is not an object.';
@@ -157,7 +157,7 @@ class PoAParser {
         }
       });
 
-      // Verifica di other_data (facoltativa)
+      // Other data validation (optional)
       if (parsedJson.containsKey('other_data') &&
           parsedJson['other_data'] is! Map) {
         return 'Error: The "other_data" field is not a valid JSON object.';
