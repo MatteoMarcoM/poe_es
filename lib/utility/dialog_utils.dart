@@ -49,9 +49,9 @@ class DialogUtils {
 
   static void showFormDialog(
     BuildContext context, {
-    required TextEditingController matricolaController,
-    required TextEditingController nomeController,
-    required TextEditingController cognomeController,
+    required TextEditingController idNumberController,
+    required TextEditingController nameController,
+    required TextEditingController surnameController,
     required TextEditingController emailController,
     required TextEditingController engagementDataController,
     required Function(String, String, String, String, String) onSubmit,
@@ -88,7 +88,7 @@ class DialogUtils {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             CommonWidgets.buildTextField(
-                              controller: matricolaController,
+                              controller: idNumberController,
                               label: "ID Number",
                               icon: Icons.badge,
                               keyboardType: TextInputType.number,
@@ -103,7 +103,7 @@ class DialogUtils {
                               },
                             ),
                             CommonWidgets.buildTextField(
-                              controller: nomeController,
+                              controller: nameController,
                               label: "First Name",
                               icon: Icons.person,
                               keyboardType: TextInputType.text,
@@ -115,7 +115,7 @@ class DialogUtils {
                               },
                             ),
                             CommonWidgets.buildTextField(
-                              controller: cognomeController,
+                              controller: surnameController,
                               label: "Last Name",
                               icon: Icons.person_outline,
                               keyboardType: TextInputType.text,
@@ -178,9 +178,9 @@ class DialogUtils {
                   onPressed: () {
                     if (formKey.currentState!.validate()) {
                       onSubmit(
-                        matricolaController.text,
-                        nomeController.text,
-                        cognomeController.text,
+                        idNumberController.text,
+                        nameController.text,
+                        surnameController.text,
                         emailController.text,
                         engagementDataController.text,
                       );

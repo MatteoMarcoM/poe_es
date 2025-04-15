@@ -30,40 +30,43 @@ class PoAParser {
   bool validateAndParse() {
     String validationMessage = validate();
     if (validationMessage == successMessage) {
-      // Parsing completo dei campi
+      // Complete parsing of fields
       proofType = parsedJson['proof_type'];
       transferable = parsedJson['transferable'];
 
-      // Parsing della chiave pubblica
+      // Parsing public key
       final publicKey = parsedJson['public_key'];
       publicKeyAlgorithm = publicKey['algorithm'];
       publicKeyVerification = publicKey['verification_key'];
 
-      // Parsing del timestamp
+      // Parsing timestamp
       final timestamp = parsedJson['timestamp'];
       timestampFormat = timestamp['time_format'];
       timestampTime = timestamp['time'];
 
-      // Parsing delle coordinate GPS
+      // Parsing GPS coordinates
       final gps = parsedJson['gps'];
       gpsLat = gps['lat'].toDouble();
       gpsLng = gps['lng'].toDouble();
       gpsAlt = gps['alt'].toDouble();
 
-      // Parsing dei dati di engagement
+      // Parsing engagement data
       final engagement = parsedJson['engagement_data'];
       engagementEncoding = engagement['encoding'];
       engagementData = engagement['data'];
 
-      // Parsing dei dati sensibili
+      // Parsing sensitive data
       final sensitiveData = parsedJson['sensitive_data'];
       sensitiveData.forEach((key, value) {
         sensitiveDataHashMap[key] = value;
       });
 
-      // Parsing di other_data
+      // Parsing other data
       if (parsedJson.containsKey('other_data')) {
-        otherDataHashMap = parsedJson['other_data'];
+        final otherData = parsedJson['other_data'];
+        otherData.forEach((key, value) {
+          otherDataHashMap[key] = value;
+        });
       }
 
       return true;
@@ -76,92 +79,98 @@ class PoAParser {
     try {
       parsedJson = jsonDecode(rawJson);
 
-      // Validation of main keys
+      // Verify main keys
       if (!parsedJson.containsKey('proof_type') ||
           parsedJson['proof_type'] is! String) {
-        return 'Error: The "proof_type" field is missing or is not a string.';
+        return 'Error: Field "proof_type" is missing or not a string.';
       }
       if (!parsedJson.containsKey('transferable') ||
           parsedJson['transferable'] is! bool) {
-        return 'Error: The "transferable" field is missing or is not a boolean.';
+        return 'Error: Field "transferable" is missing or not a boolean.';
       }
       if (!parsedJson.containsKey('public_key') ||
           parsedJson['public_key'] is! Map) {
-        return 'Error: The "public_key" field is missing or is not an object.';
+        return 'Error: Field "public_key" is missing or not a valid JSON object.';
       }
 
-      // Public key validation
+      // Verify public key
       final publicKey = parsedJson['public_key'];
       if (!publicKey.containsKey('algorithm') ||
           publicKey['algorithm'] is! String) {
-        return 'Error: The "algorithm" field is missing or is not a string.';
+        return 'Error: Field "algorithm" is missing or not a string.';
       }
       if (!publicKey.containsKey('verification_key') ||
           publicKey['verification_key'] is! String) {
-        return 'Error: The "verification_key" field is missing or is not a string.';
+        return 'Error: Field "verification_key" is missing or not a string.';
       }
 
-      // Timestamp validation
+      // Verify timestamp
       if (!parsedJson.containsKey('timestamp') ||
           parsedJson['timestamp'] is! Map) {
-        return 'Error: The "timestamp" field is missing or is not an object.';
+        return 'Error: Field "timestamp" is missing or not a valid JSON object.';
       }
       final timestamp = parsedJson['timestamp'];
       if (!timestamp.containsKey('time_format') ||
           timestamp['time_format'] is! String) {
-        return 'Error: The "time_format" field is missing or is not a string.';
+        return 'Error: Field "time_format" is missing or not a string.';
       }
       if (!timestamp.containsKey('time') || timestamp['time'] is! String) {
-        return 'Error: The "time" field is missing or is not a string.';
+        return 'Error: Field "time" is missing or not a string.';
       }
 
-      // GPS coordinates validation
+      // Verify GPS coordinates
       if (!parsedJson.containsKey('gps') || parsedJson['gps'] is! Map) {
-        return 'Error: The "gps" field is missing or is not an object.';
+        return 'Error: Field "gps" is missing or not a valid JSON object.';
       }
       final gps = parsedJson['gps'];
       if (!gps.containsKey('lat') || gps['lat'] is! num) {
-        return 'Error: The "lat" field is missing or is not a number.';
+        return 'Error: Field "lat" is missing or not a number.';
       }
       if (!gps.containsKey('lng') || gps['lng'] is! num) {
-        return 'Error: The "lng" field is missing or is not a number.';
+        return 'Error: Field "lng" is missing or not a number.';
       }
       if (!gps.containsKey('alt') || gps['alt'] is! num) {
-        return 'Error: The "alt" field is missing or is not a number.';
+        return 'Error: Field "alt" is missing or not a number.';
       }
 
-      // Engagement data validation
+      // Verify engagement data
       if (!parsedJson.containsKey('engagement_data') ||
           parsedJson['engagement_data'] is! Map) {
-        return 'Error: The "engagement_data" field is missing or is not an object.';
+        return 'Error: Field "engagement_data" is missing or not a valid JSON object.';
       }
       final engagementData = parsedJson['engagement_data'];
       if (!engagementData.containsKey('encoding') ||
           engagementData['encoding'] is! String) {
-        return 'Error: The "encoding" field is missing or is not a string.';
+        return 'Error: Field "encoding" is missing or not a string.';
       }
       if (!engagementData.containsKey('data') ||
           engagementData['data'] is! String) {
-        return 'Error: The "data" field is missing or is not a string.';
+        return 'Error: Field "data" is missing or not a string.';
       }
 
-      // Sensitive data validation
+      // Verify sensitive data
       if (!parsedJson.containsKey('sensitive_data') ||
           parsedJson['sensitive_data'] is! Map) {
-        return 'Error: The "sensitive_data" field is missing or is not an object.';
+        return 'Error: Field "sensitive_data" is missing or not a valid JSON object.';
       }
       final sensitiveData = parsedJson['sensitive_data'];
       sensitiveData.forEach((key, value) {
-        if (key.startsWith('data_') && value is! String) {
-          return 'Error: The "$key" field in sensitive data is not a string.';
+        if (key is! String || value is! String) {
+          return 'Error: Field "$key" or "$value" in sensitive data is not a string.';
         }
       });
 
-      // Other data validation (optional)
+      // Verify other_data (optional)
       if (parsedJson.containsKey('other_data') &&
           parsedJson['other_data'] is! Map) {
-        return 'Error: The "other_data" field is not a valid JSON object.';
+        return 'Error: Field "other_data" is not a valid JSON object.';
       }
+      final otherData = parsedJson['sensitive_data'];
+      otherData.forEach((key, value) {
+        if (key is! String || value is! String) {
+          return 'Error: Field "$key" or "$value" in other data is not a string.';
+        }
+      });
 
       return successMessage;
     } catch (e) {

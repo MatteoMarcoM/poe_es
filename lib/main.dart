@@ -21,18 +21,18 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const WebSocketPage(),
+      home: const ESModule(),
     );
   }
 }
 
-class WebSocketPage extends StatefulWidget {
-  const WebSocketPage({super.key});
+class ESModule extends StatefulWidget {
+  const ESModule({super.key});
   @override
-  State<WebSocketPage> createState() => _WebSocketPageState();
+  State<ESModule> createState() => _ESModuleState();
 }
 
-class _WebSocketPageState extends State<WebSocketPage> {
+class _ESModuleState extends State<ESModule> {
   late WebSocketService _webSocketService;
   final List<String> _messages = [];
   final String _peerId = "poe_es";
